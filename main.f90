@@ -36,18 +36,18 @@ program main
     end do
   end subroutine training
 
-  pure function activation(x)
+  pure function activation(a)
     ! Hyperbolic tangent activation function
-    real(8), intent(in) :: x(h)
+    real(8), intent(in) :: a(h)
     real(8) :: activation(h)
-    activation = tanh(x)
+    activation = tanh(a)
   end function activation
 
-  pure function activation_prime(x)
+  pure function activation_prime(a)
     ! Derivative of the activation function
-    real(8), intent(in) :: x(h)
+    real(8), intent(in) :: a(h)
     real(8) :: activation_prime(h)
-    activation_prime = cosh(x) ** (-2)
+    activation_prime = cosh(a) ** (-2)
   end function activation_prime
 
   pure function forward(x, w)
@@ -88,6 +88,9 @@ program main
   subroutine get_initial_weights(res)
     ! Randomly initialize weights
     type(type_weights), intent(out) :: res
+    integer :: seed(100)
+    seed(:) = 0
+    call random_seed(put=seed)
     call random_number(res%w1)
     call random_number(res%w2)
     call random_number(res%b1)
