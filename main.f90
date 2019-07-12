@@ -17,6 +17,7 @@ program main
   contains
 
   subroutine training()
+    ! Main subroutine
     integer :: itr, i
     real(8) :: train_x(d, n), train_y(k, n)
     real(8) :: loss, y(k), diff(k)
@@ -25,7 +26,7 @@ program main
     call get_training_data(train_x, train_y)
     do itr = 1, epochs
       loss = 0.0
-      do i = 1, n
+      do i = 1, n  ! Todo: shuffled order
         y = forward(train_x(:, i), weights)
         diff = y - train_y(:, i)
         loss = loss + sum(diff ** 2)
@@ -49,25 +50,25 @@ program main
     activation_prime = cosh(x) ** (-2)
   end function activation_prime
 
-  pure function forward(x, weights)
+  pure function forward(x, w)
     ! Forward evaluation of neural network
     real(8), intent(in) :: x(d)
-    type(type_weights), intent(in) :: weights
+    type(type_weights), intent(in) :: w
     real(8) :: forward(k)
-    forward = matmul(weights%w2, activation(matmul(weights%w1, x) + weights%b1)) + weights%b2
+    forward = matmul(w%w2, activation(matmul(w%w1, x) + w%b1)) + w%b2
   end function forward
 
-  subroutine backward(x, weights, diff)
-    ! Calculate derivative of loss function in weight space
+  subroutine backward(x, w, diff)
+    ! Calculate derivative of loss function in weight space and gradient descent
     real(8), intent(in) :: x(d), diff(k)
-    type(type_weights), intent(inout) :: weights
+    type(type_weights), intent(inout) :: w
     real(8) :: v1(h), v2(h)
-    v1 = matmul(diff, weights%w2) * activation_prime(matmul(weights%w1, x) + weights%b1)
-    v2 = activation(matmul(weights%w1, x) + weights%b1)
-    weights%w1 = weights%w1 - learn_rate * matmul(reshape(v1, (/h, 1/)), reshape(x, (/1, d/)))
-    weights%b1 = weights%b1 - learn_rate * v1
-    weights%w2 = weights%w2 - learn_rate * matmul(reshape(diff, (/k, 1/)), reshape(v2, (/1, h/)))
-    weights%b2 = weights%b2 - learn_rate * diff
+    v1 = matmul(diff, w%w2) * activation_prime(matmul(w%w1, x) + w%b1)
+    v2 = activation(matmul(w%w1, x) + w%b1)
+    w%w1 = w%w1 - learn_rate * matmul(reshape(v1, (/h, 1/)), reshape(x, (/1, d/)))
+    w%b1 = w%b1 - learn_rate * v1
+    w%w2 = w%w2 - learn_rate * matmul(reshape(diff, (/k, 1/)), reshape(v2, (/1, h/)))
+    w%b2 = w%b2 - learn_rate * diff
   end subroutine backward
 
   subroutine get_training_data(train_x, train_y)
