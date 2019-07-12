@@ -19,9 +19,6 @@ else ifeq ($(FC),ifort)
   endif
 endif
 
-debug: $(TARGET)
-	./$<
-
 $(TARGET): main.f90 Makefile
 	$(FC) $(FFLAGS) $< -o $@
 
